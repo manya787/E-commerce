@@ -35,7 +35,7 @@ const Signupfree = () => {
   
   return (
     <div className={`scroll-container ${animationClass}`}>
-      BECOME A DOPES MEMBER 
+      BECOME A ARShop MEMBER 
       <Button onClick={handleFilterSubmit} className={styles.applyFiltersButton}>
         SIGN UP FOR FREE &rarr;
       </Button>

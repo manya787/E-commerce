@@ -50,7 +50,7 @@ const MyModal = () => {
       <Fade in={globalShowModal}>
         <Box sx={style} className="bg-black" onClick={(e) => e.stopPropagation()}>
           <Typography id="transition-modal-title" variant="h6" component="h2" sx={{ textAlign: 'center', color: '#101820' }}>
-            Become a DOPES Member Now
+            Become a ARShop Member Now
           </Typography>
           <Button
             onClick={handleCreateAccountClick}

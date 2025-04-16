@@ -98,7 +98,7 @@ const SignupForm = () => {
       <Container component="main" maxWidth="xs">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography component="h1" variant="h5">
-            Now let's make you a DOPES member
+            Now let's make you a ARShop member
           </Typography>
           <Typography component="p" style={{ marginTop: '10px' }}>
             Please fill the form to create an account
@@ -227,7 +227,7 @@ const SignupForm = () => {
               Sign Up
             </Button>
             <Typography variant="body2" align="center" style={{ marginTop: '10px' }}>
-              Already a DOPES member? <Link to="/login" style={{ color: '#101820', textDecoration: 'underline' }}>Try Login</Link>
+              Already a ARShopS member? <Link to="/login" style={{ color: '#101820', textDecoration: 'underline' }}>Try Login</Link>
             </Typography>
           </form>
         </div>

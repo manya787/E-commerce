@@ -3,10 +3,10 @@ import Carousel from 'react-multi-carousel';
 import styles from './Collections.module.css'; // Import your CSS module
 import 'react-multi-carousel/lib/styles.css';
 import Product from './Product';
-import product_0 from '../../assets/images/collection1.png';
-import product_1 from '../../assets/images/collection2.png';
-import product_2 from '../../assets/images/collection3.png';
-import product_3 from '../../assets/images/collection5.png';
+import product_0 from '../../assets/images/collection1.jpeg';
+import product_1 from '../../assets/images/collection2.webp';
+import product_2 from '../../assets/images/collection3.jpg';
+import product_3 from '../../assets/images/collection4.jpeg';
 
 const Collections = () => {
     const [animationClass, setAnimationClass] = useState('');
@@ -37,10 +37,10 @@ const Collections = () => {
     };
 
     const productData = [
-      { id: 1, url: product_0, buttonText: "Buy Now", overlayText: "Mens thrifted shoes", route: "/Menshoes" },
-      { id: 2, url: product_1, buttonText: "Buy Now", overlayText: "Womens thrifted shoes", route: "/Womenshoes" },
-      { id: 3, url: product_2, buttonText: "Buy Now", overlayText: "Unisex thrifted caps", route: "/Caps" },
-      { id: 4, url: product_3, buttonText: "Buy Now", overlayText: "Mens thrifted shirt", route: "/Shirts" }
+      { id: 1, url: product_1, buttonText: "Buy Now", overlayText: "Tables", route: "/Furniture" },
+      { id: 2, url: product_0, buttonText: "Buy Now", overlayText: "Womens Dresses", route: "/Fashion" },
+      { id: 3, url: product_2, buttonText: "Buy Now", overlayText: "Sofas", route: "/Furniture" },
+      { id: 4, url: product_3, buttonText: "Buy Now", overlayText: "Hats", route: "/Fashion" }
   ];
   
   const products = productData.map((item) => (

@@ -13,14 +13,10 @@ export default function Product({ url, buttonText, overlayText, route }) {
   };
 
   const getCategoryFromRoute = (route) => {
-    if (route.includes('/Menshoes')) {
-      return 'men';
-    } else if (route.includes('/Womenshoes')) {
-      return 'women';
-    } else if (route.includes('/Caps')) {
-      return 'caps';
-    } else if (route.includes('/Shirts')) {
-      return 'shirts';
+    if (route.includes('/Furniture')) {
+      return 'furniture';
+    } else if (route.includes('/Fashion')) {
+      return 'fashion';
     } else {
       return '';
     }

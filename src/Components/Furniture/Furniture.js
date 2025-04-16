@@ -7,8 +7,7 @@ import Circular from "../Progress/Progress";
 import Logobar from "../Logobar/Logobar";
 import Slidertext from "../Slidertext/Slidertext";
 import ProductList from "../Products/ProductList";
-
-export default function Womenshoes() {
+export default function Furniture() {
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     setTimeout(() => {
@@ -21,14 +20,12 @@ export default function Womenshoes() {
       <Slidertext />
       <Logobar />
       <TopBar />
-      
       <ScrollingText />
       {isLoading ? (
         <Circular isLoading={isLoading} />
       ) : (
-       <ProductList />
+        <ProductList />
       )}
-
       <Signupfree />
       <Footer />
       </>

@@ -56,56 +56,46 @@ const Footer = ({ dispatch }) => {
                 About Us
               </h6>
               <p>
-              Dopes is eco-friendly marketplace for pre-loved footwear. Discover a diverse range of gently used shoes, sourced sustainably and curated for style. Shop with confidence, knowing each purchase reduces fashion waste and supports a greener future.
+              Welcome to ARShop, where we blend fashion and furniture with cutting-edge AR technology, letting you preview products in real time before you buy. Smart, stylish, and immersive shopping right at your fingertips.
               </p>
             </MDBCol>
 
             <MDBCol md="2" lg="2" xl="2" className={`footer-section-item mx-auto mb-4 ${styles.footerSectionItem}`}>
               <h6  className={`text-uppercase fw-bold mb-4 ${styles.footerheading}`}>Products</h6>
               <p>
-              <Link to='/Menshoes' className='text-reset' onClick={() => handleLinkClick('men')}>
-               Mens 
+              <Link to='/Furniture' className='text-reset' onClick={() => handleLinkClick('furniture')}>
+               Furniture 
               </Link>
 
               </p>
               <p>
-              <Link to='/Womenshoes' className='text-reset' onClick={() => handleLinkClick('women')}>
-               Womens
+              <Link to='/Fashion' className='text-reset' onClick={() => handleLinkClick('fashion')}>
+               Fashion
               </Link>
 
-              </p>
-              <p>
-                <a href='/Caps' className='text-reset'>
-                  Unisex Caps
-                </a>
-              </p>
-              <p>
-                <a href='/Winter' className='text-reset'>
-                  Winter
-                </a>
-              </p>
-              <p>
-                <a href='/Summer' className='text-reset'>
-                  Summer 
-                </a>
               </p>
             </MDBCol>
 
             <MDBCol md="3" lg="2" xl="2" className={`footer-section-item mx-auto mb-4 ${styles.footerSectionItem}`}>
               <h6 className={`text-uppercase fw-bold mb-4 ${styles.footerheading}`}>Category</h6>
               <p>
-              <Link to={`/Category/jordans`} className='text-reset' onClick={() => handlesubcategory('jordans')}>
-               Jordans
+              <Link to={`/Category/furniture`} className='text-reset' onClick={() => handlesubcategory('furniture')}>
+               Sofas
                </Link>
               </p>
               <p>
-              <Link to={`/Category/sneakers`} className='text-reset' onClick={() => handlesubcategory('sneakers')}>
-               Sneakers
+              <Link to={`/Category/furniture`} className='text-reset' onClick={() => handlesubcategory('furniture')}>
+               Tables
                </Link>
               </p>
               <p>
-              <Link to={`/Category/chelsea`} className='text-reset' onClick={() => handlesubcategory('chelsea')}>
-               Chelsea
+              <Link to={`/Category/fashion`} className='text-reset' onClick={() => handlesubcategory('fashion')}>
+               Hats
+               </Link>
+              </p>
+              <p>
+              <Link to={`/Category/fashion`} className='text-reset' onClick={() => handlesubcategory('fashion')}>
+               Women Dresses
                </Link>
               </p>
             </MDBCol>
@@ -114,11 +104,11 @@ const Footer = ({ dispatch }) => {
               <h6  className={`text-uppercase fw-bold mb-4 ${styles.footerheading}`}>Get Help</h6>
               <p>
                 <MDBIcon icon="home" className="me-2" />
-                Lahore, Pakistan
+                Noida, Uttar Pradesh
               </p>
               <p>
                 <MDBIcon icon="envelope" className="me-3" />
-                Dopes@gmail.com
+                ARShop@gmail.com
               </p>
               <p>
                 <MDBIcon icon="phone" className="me-3" /> + 01 234 567 88
@@ -132,9 +122,9 @@ const Footer = ({ dispatch }) => {
       </section>
 
       <div className={`footer-section text-center p-4 ${styles.footerSection}`} style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}>
-        © 2021 Copyright:
+        © 2025 Copyright:
         <a className='text-reset fw-bold' href='https://mdbootstrap.com/'>
-          MDBootstrap.com
+          Manya and Aryan
         </a>
       </div>
     </MDBFooter>
