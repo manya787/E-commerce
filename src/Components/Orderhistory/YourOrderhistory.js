@@ -16,7 +16,7 @@ const YourOrderhistory = () => {
   const email = useSelector(selectEmail);
   const loginStatusExists = useSelector(selectLoginStatusexist);
   const data = useSelector((state) => state.ordershistory) || { grandTotals: [] };
-  const grandTotals = data.grandTotals || [];
+  const grandTotals = Array.isArray(data.grandTotals) ? data.grandTotals : [];
 
   useEffect(() => {
     if (loginStatusExists === true) {

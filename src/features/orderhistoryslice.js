@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const orderHistorySlice = createSlice({
   name: 'orderHistory',
   initialState: {
-    grandTotals: null,
+    grandTotals: [],
     loading: false,
     error: null,
   },
