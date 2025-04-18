@@ -10,7 +10,6 @@ import {watchFetchGrandTotal} from '../sagas/Order_history_saga';
 import {watchSearch} from '../sagas/search_saga';
 import {watchFetchreviewsdetails} from '../sagas/reviews_saga'
 import reviewSaga from '../sagas/add_review_saga';
-import virtualproductSaga from '../sagas/virtual_try_room_saga';
 import {watchFetchDiscounts} from '../sagas/discount_saga'
 
 export default function* rootSaga() {
@@ -26,7 +25,6 @@ export default function* rootSaga() {
     watchFetchreviewsdetails(),
     reviewSaga(),
     watchFetchGrandTotal(),
-    virtualproductSaga(),
     watchFetchDiscounts()
   
   ]);

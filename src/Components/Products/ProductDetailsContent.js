@@ -22,7 +22,6 @@ import { fetchProductDetailsStart, sendProductIDStart } from '../../features/pro
 import { addToCartStart } from '../../features/cartslice';
 import notificationSound from './notification.mp3';
 import { Link } from 'react-router-dom';
-
 const ProductDetailsContent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,25 +34,24 @@ const ProductDetailsContent = () => {
   const { product_id } = useParams();
   
   console.log(product_id);
-  const firstImages = data.selectedProduct.image ? data.selectedProduct.image.split(',')[0].trim() : '';
-  const secondImages = data.selectedProduct.image ? data.selectedProduct.image.split(',')[1].trim() : '';
-  const thirdImages = data.selectedProduct.image ? data.selectedProduct.image.split(',')[2].trim() : '';
-  const forthImages = data.selectedProduct.image ? data.selectedProduct.image.split(',')[3].trim() : '';
-  const imageURL = "http://localhost:3001/";
-  const image1URL = imageURL + firstImages;
-  const image2URL = imageURL + secondImages;
-  const image3URL = imageURL + thirdImages;
-  const image4URL = imageURL + forthImages;
+  const placeholderImage = require('../../assets/images/1.jpg');
+
+  const imageFileName = data.selectedProduct && data.selectedProduct.image_path ? data.selectedProduct.image_path : null;
+
+  let image1URL;
+
+  try {
+    image1URL = imageFileName ? require(`../../assets/images/${imageFileName}`) : placeholderImage;
+  } catch (error) {
+    image1URL = placeholderImage;
+  }
 
   const images = [
-    { id: 1, url: image1URL },
-    { id: 2, url: image2URL },
-    { id: 3, url: image3URL },
-    { id: 4, url: image4URL }
+    { id: 1, url: image1URL }
   ];
 
   const productBrand = data?.selectedProduct?.brand;
-  const productCondition = data?.selectedProduct?.shoecondition;
+  const productCondition = data?.selectedProduct?.condition;
   const productDescription = data?.selectedProduct?.description;
   const productName = data?.selectedProduct?.productname;
   const productPrice = data?.selectedProduct?.price;
@@ -64,10 +62,6 @@ const ProductDetailsContent = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-  };
-
-  const handleVirtualTryRoom = (product_id) => {
-    navigate(`/VirtualTry/${product_id}`);
   };
 
   const handleAddToCart = () => {
@@ -99,6 +93,12 @@ const ProductDetailsContent = () => {
       }, 1000);
     }
   }, [playNotificationSound]);
+
+  useEffect(() => {
+    if (product_id) {
+    dispatch(fetchProductDetailsStart(product_id));
+    }
+    }, [dispatch, product_id]);
 
   // Function to calculate discounted price
   const getDiscountedPrice = (price) => {
@@ -211,11 +211,11 @@ const ProductDetailsContent = () => {
               {/* Meta tags */}
               <ul className={styles.metaTagList}>
                 <li>
-                  <span className={styles.headings}>Brand :</span>{productBrand}
+                  <span className={styles.headings}>Brand : {productBrand}</span>
                 </li>
-                <li>
+                {/* <li>
                   <span className={styles.headings}>Condition :</span>{productCondition}
-                </li>
+                </li> */}
               
               </ul>
 
@@ -244,6 +244,18 @@ const ProductDetailsContent = () => {
               {/* Conditionally render buttons based on product status */}
               {productStatus !== "out of stock" && (
                 <>
+                  {data.selectedProduct && data.selectedProduct.qr_path && (
+                    <Box sx={{ mt: 2, mb: 2}}>
+                      <Typography variant="body1" sx={{ mb: 1, fontStyle: 'italic', color: '#555' }}>
+                      Scan to view this product in AR.
+                      </Typography>
+                      <img
+                        src={require(`../../assets/images/${data.selectedProduct.qr_path}`)}
+                        alt="Product QR Code"
+                        style={{ width: '150px', height: '150px' }}
+                      />
+                    </Box>
+                  )}
                   <Button
                     onClick={handleAddToCart}
                     variant="contained"
@@ -257,15 +269,6 @@ const ProductDetailsContent = () => {
                   >
                     Add To Cart
                   </Button>
-                  <Link to={`/VirtualTry/${product_id}`}>
-                    <Button
-                      endIcon={<DirectionsWalkIcon sx={{ color: "#fff !important" }} />}
-                      variant="contained"
-                      className={styles.buttonvirtualtry}
-                    >
-                      Try Virtually
-                    </Button>
-                  </Link>
                 </>
               )}
             </Box>

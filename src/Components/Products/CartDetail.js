@@ -205,8 +205,7 @@ const CartDetail = () => {
             </TableHead>
             <TableBody>
               {products.map((pro) => {
-                const firstImage = pro.image ? pro.image.split(',')[0].trim() : '';
-                const image1URL = `http://localhost:3001/${firstImage}`;
+                const image1URL = require(`../../assets/images/${pro.image_path}`);
                 const discountedPrice = getDiscountedPrice(pro.price);
 
                 return (

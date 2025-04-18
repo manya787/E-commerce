@@ -10,7 +10,7 @@ function* fetchData(action) {
       url = `http://localhost:3001/api/products/${subcategory}`;
     } else {
       // If subcategory is not provided, fetch products based on category
-      url = category === 'men' ? 'http://localhost:3001/api/products_list_mens' : 'http://localhost:3001/api/products_list_womens';
+      url = category === 'furniture' ? 'http://localhost:3001/api/products_list_furniture' : 'http://localhost:3001/api/products_list_fashion';
     }
     const response = yield call(fetch, url);
     if (!response.ok) {

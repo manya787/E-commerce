@@ -11,12 +11,14 @@ const getproduct = createSlice({
   },
   reducers: {
     filterusers: (state, action) => {
-      const { sizes, brands, conditions } = action.payload;
+      const { sizes = [], brands = [], conditions = [], colors = [], minPrice = 0, maxPrice = Number.MAX_SAFE_INTEGER } = action.payload;
       console.log(action.payload);
       const filteredUsers = state.userscontainer.filter(user => (
         (sizes.length === 0 || sizes.includes(user.size)) &&
         (brands.length === 0 || brands.includes(user.brand)) &&
-        (conditions.length === 0 || conditions.includes(user.shoecondition))
+        (conditions.length === 0 || conditions.includes(user.condition)) &&
+        (colors.length === 0 || colors.includes(user.color)) &&
+        (user.price >= minPrice && user.price <= maxPrice)
       ));
       state.users = filteredUsers;
     },

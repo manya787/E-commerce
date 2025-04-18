@@ -48,9 +48,8 @@ const ProductList = () => {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.allproducts);
   const discounts = useSelector((state) => state.discount.discounts);
-  const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
-  const [selectedConditions, setSelectedConditions] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
@@ -74,19 +73,8 @@ const ProductList = () => {
     
   }, [dispatch]);
 
-  const uniqueSizes = Array.from(new Set(data.userscontainer && Array.isArray(data.userscontainer) ? data.userscontainer.map(ele => ele.size) : []));
   const uniqueBrands = Array.from(new Set(data.userscontainer && Array.isArray(data.userscontainer) ? data.userscontainer.map(ele => ele.brand) : []));
-  const uniqueConditions = Array.from(new Set(data.userscontainer && Array.isArray(data.userscontainer) ? data.userscontainer.map(ele => ele.shoecondition) : []));
-
-  const handleSizeClick = (size) => {
-    const newSelectedSizes = selectedSizes.includes(size)
-      ? selectedSizes.filter((s) => s !== size)
-      : [...selectedSizes, size];
-
-    setSelectedSizes(newSelectedSizes);
-
-    applyFilters({ sizes: newSelectedSizes, brands: selectedBrands, conditions: selectedConditions });
-  };
+  const uniqueColors = ["Blue", "Red", "Yellow", "White", "Black", "Brown", "Purple"];
 
   const handleBrandClick = (brand) => {
     const newSelectedBrands = selectedBrands.includes(brand)
@@ -95,36 +83,27 @@ const ProductList = () => {
 
     setSelectedBrands(newSelectedBrands);
 
-    applyFilters({ sizes: selectedSizes, brands: newSelectedBrands, conditions: selectedConditions });
+    applyFilter({ brands: newSelectedBrands, colors: selectedColors });
   };
 
-  const handleConditionClick = (condition) => {
-    const newSelectedConditions = selectedConditions.includes(condition)
-      ? selectedConditions.filter((c) => c !== condition)
-      : [...selectedConditions, condition];
+  const handleColorClick = (color) => {
+    const newSelectedColors = selectedColors.includes(color)
+      ? selectedColors.filter((c) => c !== color)
+      : [...selectedColors, color];
 
-    setSelectedConditions(newSelectedConditions);
+    setSelectedColors(newSelectedColors);
 
-    applyFilters({ sizes: selectedSizes, brands: selectedBrands, conditions: newSelectedConditions });
+    applyFilter({ brands: selectedBrands, colors: newSelectedColors });
   };
 
   const handleResetFilters = () => {
-    setSelectedSizes([]);
     setSelectedBrands([]);
-    setSelectedConditions([]);
+    setSelectedColors([]);
+    setMinPrice(0);
+    setMaxPrice(5000);
 
     // Reset filters to show all products
-    dispatch(filterusers({ sizes: [], brands: [], conditions: [] }));
-  };
-
-  const applyFilters = (filters) => {
-    console.log(filters);
-    dispatch(filterusers(filters));
-  };
-
-  const handlePriceChange = (values) => {
-    setMinPrice(values[0]);
-    setMaxPrice(values[1]);
+    dispatch(filterusers({ brands: [], colors: [], minPrice: 0, maxPrice: 5000 }));
   };
 
   const applyFilter = (filters) => {
@@ -135,36 +114,40 @@ const ProductList = () => {
     dispatch(filterusers({ ...filters, ...priceFilters }));
   };
 
+  const handlePriceChange = (values) => {
+    setMinPrice(values[0]);
+    setMaxPrice(values[1]);
+    applyFilter({ brands: selectedBrands, colors: selectedColors });
+  };
+
   // Pagination functions
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = data.users
-    ? data.users.filter(ele => ele.price >= minPrice && ele.price <= maxPrice).slice(indexOfFirstProduct, indexOfLastProduct)
-    : [];
-
+  const currentProducts = data.users;
+  console.log('Current Products:', currentProducts); // Log current products
   const totalPages = Math.ceil((data.users ? data.users.length : 0) / productsPerPage);
 
   const handlePageChange = (event, newPage) => {
     setCurrentPage(newPage);
   };
 
-  // Function to calculate discounted price
-  const getDiscountedPrice = (price) => {
-    const today = new Date();
-    const discount = discounts.find(discount => {
-      const startDate = new Date(discount.startDate);
-      const endDate = new Date(discount.endDate);
-      return discount.isActive === 1 && today >= startDate && today <= endDate;
-    });
+  // // Function to calculate discounted price
+  // const getDiscountedPrice = (price) => {
+  //   const today = new Date();
+  //   const discount = discounts.find(discount => {
+  //     const startDate = new Date(discount.startDate);
+  //     const endDate = new Date(discount.endDate);
+  //     return discount.isActive === 1 && today >= startDate && today <= endDate;
+  //   });
 
-    if (discount) {
-      const discountAmount = discount.amount;
-      const discountedPrice = price - (price * (discountAmount / 100));
-      return discountedPrice.toFixed(2);
-    }
+  //   if (discount) {
+  //     const discountAmount = discount.amount;
+  //     const discountedPrice = price - (price * (discountAmount / 100));
+  //     return discountedPrice.toFixed(2);
+  //   }
 
-    return price.toFixed(2);
-  };
+  //   return price.toFixed(2);
+  // };
 
   return (
     <Grid container className={styles.ProductListContainer}>
@@ -174,23 +157,6 @@ const ProductList = () => {
             <Box style={{ border: '0px solid #D3D3D3', borderRadius: '10px', marginRight: '40px', padding: '0px' }}>
               <Typography style={{ width: '110%', fontSize: '15px', textAlign: 'center', borderRadius: '5px', color: '#fff', fontWeight: 'inherit', backgroundColor: '#101820', marginBottom: '5px', paddingTop: '4px', paddingBottom: '4px' }}>Selected Filters</Typography>
               <div style={{ display: 'flex', flexWrap: 'wrap', color: '#101820 !important' }}>
-                {selectedSizes.map((size) => (
-                  <div key={`selected-size-${size}`} style={{ marginRight: '5px', marginBottom: '5px' }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => handleSizeClick(size)}
-                      color="primary"
-                      sx={{
-                        borderColor: '#787a7c !important',
-                        borderRadius: '2px !important'
-                      }}
-                      style={{ marginLeft: '5px', backgroundColor: '#f2f2f2', color: '#787a7c' }}
-                    >
-                      {size}{' '}&#10005;
-                    </Button>
-                  </div>
-                ))}
                 {selectedBrands.map((brand) => (
                   <div key={`selected-brand-${brand}`} style={{ marginRight: '5px', marginBottom: '5px' }}>
                     <Button
@@ -207,24 +173,8 @@ const ProductList = () => {
                     </Button>
                   </div>
                 ))}
-                {selectedConditions.map((condition) => (
-                  <div key={`selected-condition-${condition}`} style={{ marginRight: '5px', marginBottom: '5px' }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => handleConditionClick(condition)}
-                      sx={{
-                        borderColor: '#787a7c !important',
-                        borderRadius: '2px !important'
-                      }}
-                      style={{ marginLeft: '5px', backgroundColor: '#f2f2f2', color: '#787a7c' }}
-                    >
-                      {condition}{' '}&#10005;
-                    </Button>
-                  </div>
-                ))}
               </div>
-              {selectedSizes.length > 0 || selectedBrands.length > 0 || selectedConditions.length > 0 ? (
+              {selectedBrands.length > 0 ? (
                 <>
                   <Button
                     variant="outlined"
@@ -246,12 +196,14 @@ const ProductList = () => {
                 </>
               ) : null}
             </Box>
-            <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>Size</Typography>
-            {data.users && renderSelectableBoxes(uniqueSizes, handleSizeClick, selectedSizes, 'EUR', true)}
             <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>Brand</Typography>
             {data.users && renderSelectableBoxes(uniqueBrands, handleBrandClick, selectedBrands, undefined, true)}
-            <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>Condition</Typography>
-            {data.users && renderSelectableBoxes(uniqueConditions, handleConditionClick, selectedConditions, undefined, false)}
+            <div style={{ margin: '20px 0' }}>
+              <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
+                Color
+              </Typography>
+              {renderSelectableBoxes(uniqueColors, handleColorClick, selectedColors, undefined, true)}
+            </div>
             <div style={{ margin: '20px 0' }}>
               <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
                 Price Range
@@ -302,11 +254,11 @@ const ProductList = () => {
             // const firstImage = ele.image ? ele.image.split(',')[0].trim() : '';
             // const image1URL = "http://localhost:3001/" + firstImage;
             const image1URL = require(`../../assets/images/${ele.image_path}`);
-            const discountedPrice = getDiscountedPrice(ele.price);
-            const isDiscountAvailable = discountedPrice !== ele.price.toFixed(2);
+            // const discountedPrice = getDiscountedPrice(ele.price);
+            // const isDiscountAvailable = discountedPrice !== ele.price.toFixed(2);
 
             return (
-              <Grid className={styles.ProductCard} item xs={6} sm={6} md={4} key={ele.productid}>
+              <Grid className={styles.ProductCard} item xs={5} sm={5} md={5} key={ele.productid || ele.id}>
                 {(
                   <Box
                     className={styles.ProductImage}
@@ -316,7 +268,7 @@ const ProductList = () => {
                   />
                 )}
                  <Link
-                  to={`/Shoe/${ele.productid}`}
+                  to={`/product/${ele.productid}`}
                   className={styles.ProductLink}
                   onClick={() => handleProductClick(ele.productid)}
                 >
@@ -324,22 +276,14 @@ const ProductList = () => {
                   {ele.productname}
                   </Typography>
                 </Link>
-                <Typography variant="body2" className={styles.Product_condition}>
-                  <span style={{ fontSize: '15px', color: '#101820' }}>Condition:</span> {ele.shoecondition}
-                </Typography>
+                {/* <Typography variant="body2" className={styles.Product_condition}>
+                  <span style={{ fontSize: '15px', color: '#101820' }}>Condition:</span> {ele.condition}
+                </Typography> */}
                 <Typography className={styles.ProductPrice} variant="h5">
-                  {isDiscountAvailable && (
-                    <span style={{ textDecoration: 'line-through', marginRight: '5px', color: '#D3D3D3' }}>
-                     Rs.{ele.price.toFixed(2)}
-                    </span>
-                  )}
-                  <span style={{ color: '#ff6d00' }}>
-                  Rs.{discountedPrice}
-                  </span>
+                Rs.{ele.price}
                 </Typography>
-
-                <Typography className={styles.ProductShipping} variant="subtitle2">
-                  Rs.6 for shipping
+                <Typography className={styles.ProductBrand} variant="body2" sx={{ color: '#888888', marginTop: '4px' }}>
+                {ele.brand}
                 </Typography>
               </Grid>
             );

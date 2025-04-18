@@ -18,7 +18,6 @@ import Fashion from './Components/Fashion/Fashion';
 import Orderhistory from './Components/Orderhistory/index';
 import Verifyemailindex from './Components/verifyemail/verifyemailindex'
 import Category from './Components/Category/Category';
-import DeepARComponent from './Components/virtualtryroom/DeepARComponent';
 
 function App() {
   const routes = [
@@ -27,7 +26,7 @@ function App() {
       element: <Dashboard />,
     },
     {
-      path: 'Shoe/:product_id', 
+      path: 'Product/:product_id', 
       element: <Cart />,
     },
     {
@@ -70,11 +69,6 @@ function App() {
       path: routesName.verifyemail,
       element: <Verifyemailindex />,
     },
-    {
-      path: 'VirtualTry/:product_id',
-      element: <DeepARComponent />,
-    },
-    
   ];
 
   return (

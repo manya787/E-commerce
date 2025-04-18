@@ -9,5 +9,4 @@ export const routesName = {
    fashion:"/fashion",
    Orderhistory:"/Orderhistory",
    verifyemail:"/verifyemail",
-   VirtualTry:"/VirtualTry"
   }

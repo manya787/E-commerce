@@ -16,7 +16,6 @@ import storage from 'redux-persist/lib/storage';
 import authslice from './features/authslice';
 import reviewslice from './features/reviewslice';
 import orderHistorySlice from './features/orderhistoryslice';
-import virtualproductSlice from './features/virtual_try_room_slice';
 import discountSlice from './features/DiscountSlice';
 const persistConfig ={
   key:"root",
@@ -35,7 +34,6 @@ const reducer=combineReducers({
   search: searchSlice,
   review:reviewslice,
   ordershistory:orderHistorySlice,
-  virtualproduct:virtualproductSlice,
   discount:discountSlice,
  
 });

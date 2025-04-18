@@ -76,7 +76,7 @@ const Searchfunctionality = () => {
 
   const uniqueSizes = Array.from(new Set(data.productarrayfilter && Array.isArray(data.productarrayfilter) ? data.productarrayfilter.map(ele => ele.size) : []));
   const uniqueBrands = Array.from(new Set(data.productarrayfilter && Array.isArray(data.productarrayfilter) ? data.productarrayfilter.map(ele => ele.brand) : []));
-  const uniqueConditions = Array.from(new Set(data.productarrayfilter && Array.isArray(data.productarrayfilter) ? data.productarrayfilter.map(ele => ele.shoecondition) : []));
+  const uniqueConditions = Array.from(new Set(data.productarrayfilter && Array.isArray(data.productarrayfilter) ? data.productarrayfilter.map(ele => ele.condition) : []));
 
   const handleSizeClick = (size) => {
     const newSelectedSizes = selectedSizes.includes(size)
@@ -311,7 +311,7 @@ const Searchfunctionality = () => {
                   />
                 )}
                 <Link
-                  to={`/Shoe/${ele.productid}`}
+                  to={`/Product/${ele.productid}`}
                   className={styles.ProductLink}
                   onClick={() => handleProductClick(ele.productid)}
                 >
@@ -320,7 +320,7 @@ const Searchfunctionality = () => {
                   </Typography>
                 </Link>
                 <Typography variant="body2" className={styles.Product_condition}>
-                  <span style={{ fontSize: '15px', color: '#101820' }}>Condition:</span> {ele.shoecondition}
+                  <span style={{ fontSize: '15px', color: '#101820' }}>Condition:</span> {ele.condition}
                 </Typography>
                 <Typography className={styles.ProductPrice} variant="h5">
                   {isDiscountAvailable && (

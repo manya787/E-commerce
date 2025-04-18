@@ -124,60 +124,68 @@ app.post('/api/billing_information', async (req, res) => {
 
   try {
     const roleid = 3;
-    // SQL query to insert billing information into the user table
-    const insertQuery = 'INSERT INTO user (fname, lname, email, contact, address, city, roleid) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const [userResult] = await pool.execute(insertQuery, [firstName, lastName, emailAddress, phone, address, townCity, roleid]);
 
-    // Check if the insertion into user table was successful
-    if (userResult.affectedRows === 1) {
-      console.log('User information stored successfully');
-      // Retrieve the generated userid
-      const userid = userResult.insertId;
+    // Check if user already exists by email
+    const checkUserQuery = 'SELECT userid FROM user WHERE email = ?';
+    const [existingUserRows] = await pool.execute(checkUserQuery, [emailAddress]);
 
-      // Insert order information into the order table
-      const orderInsertQuery = 'INSERT INTO `order` (userid, subtotal, grandtotal, orderdate) VALUES (?, ?, ?, ?)';
-      const [orderResult] = await pool.execute(orderInsertQuery, [userid, subtotalvalue, totalAmountvalue, orderDate]);
+    let userid;
+    if (existingUserRows.length > 0) {
+      // User exists, use existing userid
+      userid = existingUserRows[0].userid;
+      console.log('Existing user found with userid:', userid);
+    } else {
+      // Insert new user
+      const insertQuery = 'INSERT INTO user (fname, lname, email, contact, address, city, roleid) VALUES (?, ?, ?, ?, ?, ?, ?)';
+      const [userResult] = await pool.execute(insertQuery, [firstName, lastName, emailAddress, phone, address, townCity, roleid]);
 
-      // Check if the insertion into order table was successful
-      if (orderResult.affectedRows === 1) {
-        console.log('Order information stored successfully');
-        // Retrieve the generated orderid
-        const orderid = orderResult.insertId;
-
-        // Insert each product ID into the orderitem table and update product status
-        for (const productId of productIds) {
-          const orderItemInsertQuery = 'INSERT INTO orderitem (orderid, productid) VALUES (?, ?)';
-          await pool.execute(orderItemInsertQuery, [orderid, productId]);
-
-          const updateProductStatusQuery = 'UPDATE products SET status = "out of stock" WHERE productid = ?';
-          await pool.execute(updateProductStatusQuery, [productId]);
-        }
-
-        // Send confirmation email
-        const mailOptions = {
-          to: emailAddress,
-          subject: 'Order Confirmation',
-          html: `
-            <p>Thank you for placing your order! Your order# is <strong>${orderid}</strong>.</p>
-          `
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            console.log('Error sending email:', error);
-          } else {
-            console.log('Email sent:', info.response);
-          }
-        });
-
-        console.log('Order and billing information stored successfully');
-        return res.status(200).json({ message: 'Order and billing information stored successfully', orderId: orderid });
+      if (userResult.affectedRows === 1) {
+        userid = userResult.insertId;
+        console.log('New user inserted with userid:', userid);
       } else {
-        console.error('Error storing order information');
+        console.error('Error storing user information');
         return res.status(500).json({ error: 'Internal Server Error' });
       }
+    }
+
+    // Insert order information into the order table
+    const orderInsertQuery = 'INSERT INTO `order` (userid, subtotal, grandtotal, orderdate) VALUES (?, ?, ?, ?)';
+    const [orderResult] = await pool.execute(orderInsertQuery, [userid, subtotalvalue, totalAmountvalue, orderDate]);
+
+    if (orderResult.affectedRows === 1) {
+      console.log('Order information stored successfully');
+      const orderid = orderResult.insertId;
+
+      // Insert each product ID into the orderitem table and update product status
+      for (const productId of productIds) {
+        const orderItemInsertQuery = 'INSERT INTO orderitem (orderid, productid) VALUES (?, ?)';
+        await pool.execute(orderItemInsertQuery, [orderid, productId]);
+
+        const updateProductStatusQuery = 'UPDATE products SET status = "out of stock" WHERE productid = ?';
+        await pool.execute(updateProductStatusQuery, [productId]);
+      }
+
+      // Send confirmation email
+      const mailOptions = {
+        to: emailAddress,
+        subject: 'Order Confirmation',
+        html: `
+          <p>Thank you for placing your order! Your order# is <strong>${orderid}</strong>.</p>
+        `
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log('Error sending email:', error);
+        } else {
+          console.log('Email sent:', info.response);
+        }
+      });
+
+      console.log('Order and billing information stored successfully');
+      return res.status(200).json({ message: 'Order and billing information stored successfully', orderId: orderid });
     } else {
-      console.error('Error storing user information');
+      console.error('Error storing order information');
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   } catch (error) {
@@ -191,7 +199,7 @@ app.get('/api/filterOptions', async (req, res) => {
   try {
     const sizesQuery = 'SELECT DISTINCT size FROM products';
     const brandsQuery = 'SELECT DISTINCT brand FROM products';
-    const conditionsQuery = 'SELECT DISTINCT shoecondition FROM products';
+    const conditionsQuery = 'SELECT DISTINCT condition FROM products';
     const productidQuery='SELECT productid FROM products'
 
     const [sizesRows] = await pool.query(sizesQuery);
@@ -203,7 +211,7 @@ app.get('/api/filterOptions', async (req, res) => {
       productids:productidRows.map((row) => row.productid),
       sizes: sizesRows.map((row) => row.size),
       brands: brandsRows.map((row) => row.brand),
-      conditions: conditionsRows.map((row) => row.shoecondition),
+      conditions: conditionsRows.map((row) => row.condition),
     };
 
     console.log('Filter options:', filterOptions);
@@ -214,12 +222,12 @@ app.get('/api/filterOptions', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-app.get('/api/products_list_mens', async (req, res) => {
+app.get('/api/products_list_furniture', async (req, res) => {
   try {
     let query = `
       SELECT * 
       FROM products
-      WHERE category = 'men'
+      WHERE category = 'furniture'
     `;
 
     const [rows] = await pool.query(query);
@@ -230,12 +238,12 @@ app.get('/api/products_list_mens', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-app.get('/api/products_list_womens', async (req, res) => {
+app.get('/api/products_list_fashion', async (req, res) => {
   try {
     let query = `
       SELECT * 
       FROM products
-      WHERE category = 'women'
+      WHERE category = 'fashion'
     `;
 
     const [rows] = await pool.query(query);

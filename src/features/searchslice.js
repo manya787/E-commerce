@@ -22,7 +22,7 @@ const searchSlice = createSlice({
       const filteredUsers = state.productarrayfilter.filter(user => (
         (sizes.length === 0 || sizes.includes(user.size)) &&
         (brands.length === 0 || brands.includes(user.brand)) &&
-        (conditions.length === 0 || conditions.includes(user.shoecondition))
+        (conditions.length === 0 || conditions.includes(user.condition))
       ));
       state.productarray = filteredUsers;
     },
