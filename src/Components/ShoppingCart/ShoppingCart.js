@@ -111,40 +111,44 @@ const ShoppingCart = () => {
             </TableHead>
             <TableBody>
               {products.map((product) => {
-                const firstImage = product.image ? product.image.split(',')[0].trim() : '';
-                const image1URL = `http://localhost:3001/${firstImage}`;
-                const discountedPrice = getDiscountedPrice(product.price);
-                
-                return (
-                  <TableRow key={product.productId}>
-                    <TableCell
-                     align="left"
-                     colSpan={2}
-                      sx={{
-                        borderBottom: '1px solid #F7FAFF',
-                        fontSize: '12px',
-                        padding: '8px 10px',
-                      }}
-                    >
-                      <img
-                        src={image1URL}
-                        alt="Product Img"
-                        width={50}
-                        className="borderRadius10"
-                      />
-                    </TableCell>
-                    <TableCell
-                      align="right"
-                      sx={{
-                        borderBottom: '1px solid #F7FAFF',
-                        fontSize: '12px',
-                        padding: '8px 10px',
-                      }}
-                    >
-                     Rs.{discountedPrice}
-                    </TableCell>
-                  </TableRow>
-                );
+              let image1URL;
+              try {
+                image1URL = require(`../../assets/images/${product.image_path}`);
+              } catch (error) {
+                image1URL = require('../../assets/images/1.jpg'); // fallback image
+              }
+              const discountedPrice = getDiscountedPrice(product.price);
+              
+              return (
+                <TableRow key={product.productid}>
+                  <TableCell
+                   align="left"
+                   colSpan={2}
+                    sx={{
+                      borderBottom: '1px solid #F7FAFF',
+                      fontSize: '12px',
+                      padding: '8px 10px',
+                    }}
+                  >
+                    <img
+                      src={image1URL}
+                      alt="Product Img"
+                      width={50}
+                      className="borderRadius10"
+                    />
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      borderBottom: '1px solid #F7FAFF',
+                      fontSize: '12px',
+                      padding: '8px 10px',
+                    }}
+                  >
+                   Rs.{discountedPrice}
+                  </TableCell>
+                </TableRow>
+              );
               })}
 
               <TableRow>

@@ -205,7 +205,12 @@ const CartDetail = () => {
             </TableHead>
             <TableBody>
               {products.map((pro) => {
-                const image1URL = require(`../../assets/images/${pro.image_path}`);
+                let image1URL;
+                try {
+                  image1URL = require(`../../assets/images/${pro.image_path}`);
+                } catch (error) {
+                  image1URL = require('../../assets/images/1.jpg'); // fallback image
+                }
                 const discountedPrice = getDiscountedPrice(pro.price);
 
                 return (
