@@ -24,7 +24,7 @@ export default function Furniture() {
       {isLoading ? (
         <Circular isLoading={isLoading} />
       ) : (
-        <ProductList />
+        <ProductList category="furniture" />
       )}
       <Signupfree />
       <Footer />

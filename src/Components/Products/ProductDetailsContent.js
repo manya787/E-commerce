@@ -34,17 +34,13 @@ const ProductDetailsContent = () => {
   const { product_id } = useParams();
   
   console.log(product_id);
-  const placeholderImage = require('../../assets/images/1.jpg');
+  const placeholderImage = '/placeholder.png'; // Use a placeholder image URL or local public folder image
 
   const imageFileName = data.selectedProduct && data.selectedProduct.image_path ? data.selectedProduct.image_path : null;
 
-  let image1URL;
+  const backendImageBaseURL = 'http://localhost:3001/productimages/';
 
-  try {
-    image1URL = imageFileName ? require(`../../assets/images/${imageFileName}`) : placeholderImage;
-  } catch (error) {
-    image1URL = placeholderImage;
-  }
+  const image1URL = imageFileName ? backendImageBaseURL + encodeURIComponent(imageFileName) : placeholderImage;
 
   const images = [
     { id: 1, url: image1URL }
@@ -249,11 +245,26 @@ const ProductDetailsContent = () => {
                       <Typography variant="body1" sx={{ mb: 1, fontStyle: 'italic', color: '#555' }}>
                       Scan to view this product in AR.
                       </Typography>
-                      <img
-                        src={require(`../../assets/images/${data.selectedProduct.qr_path}`)}
-                        alt="Product QR Code"
-                        style={{ width: '150px', height: '150px' }}
-                      />
+                  {(() => {
+                    try {
+                      return (
+                        <img
+                          src={require(`../../assets/images/${data.selectedProduct.qr_path}`)}
+                          alt="Product QR Code"
+                          style={{ width: '150px', height: '150px' }}
+                        />
+                      );
+                    } catch (error) {
+                      const placeholderQR = require('../../assets/images/qr16.png');
+                      return (
+                        <img
+                          src={placeholderQR}
+                          alt="Placeholder QR Code"
+                          style={{ width: '150px', height: '150px' }}
+                        />
+                      );
+                    }
+                  })()}
                     </Box>
                   )}
                   <Button

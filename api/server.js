@@ -16,7 +16,7 @@ app.use(cors({
 }));
 
 app.use(express.static('effects'));
-app.use(express.static('productimages'));
+app.use('/productimages', express.static(path.join(__dirname, 'productimages')));
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -197,21 +197,37 @@ app.post('/api/billing_information', async (req, res) => {
 
 app.get('/api/filterOptions', async (req, res) => {
   try {
-    const sizesQuery = 'SELECT DISTINCT size FROM products';
-    const brandsQuery = 'SELECT DISTINCT brand FROM products';
-    const conditionsQuery = 'SELECT DISTINCT condition FROM products';
-    const productidQuery='SELECT productid FROM products'
+    const category = req.query.category;
 
-    const [sizesRows] = await pool.query(sizesQuery);
-    const [brandsRows] = await pool.query(brandsQuery);
-    const [conditionsRows] = await pool.query(conditionsQuery);
-    const [productidRows] = await pool.query(productidQuery);
+    let sizesQuery = 'SELECT DISTINCT size FROM products';
+    let brandsQuery = 'SELECT DISTINCT brand FROM products';
+    let conditionsQuery = 'SELECT DISTINCT condition FROM products';
+    let colorsQuery = 'SELECT DISTINCT color FROM products';
+    let productidQuery = 'SELECT productid FROM products';
+
+    const queryParams = [];
+
+    if (category) {
+      sizesQuery += ' WHERE category = ?';
+      brandsQuery += ' WHERE category = ?';
+      conditionsQuery += ' WHERE category = ?';
+      colorsQuery += ' WHERE category = ?';
+      productidQuery += ' WHERE category = ?';
+      queryParams.push(category);
+    }
+
+    const [sizesRows] = await pool.query(sizesQuery, queryParams);
+    const [brandsRows] = await pool.query(brandsQuery, queryParams);
+    const [conditionsRows] = await pool.query(conditionsQuery, queryParams);
+    const [colorsRows] = await pool.query(colorsQuery, queryParams);
+    const [productidRows] = await pool.query(productidQuery, queryParams);
 
     const filterOptions = {
-      productids:productidRows.map((row) => row.productid),
+      productids: productidRows.map((row) => row.productid),
       sizes: sizesRows.map((row) => row.size),
       brands: brandsRows.map((row) => row.brand),
       conditions: conditionsRows.map((row) => row.condition),
+      colors: colorsRows.map((row) => row.color),
     };
 
     console.log('Filter options:', filterOptions);
@@ -219,6 +235,78 @@ app.get('/api/filterOptions', async (req, res) => {
     console.log('Filter options fetched successfully');
   } catch (error) {
     console.error('Error fetching filter options:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/filterOptions/furniture', async (req, res) => {
+  try {
+    const category = 'furniture';
+
+    const allowedColors = ['white', 'grey', 'blue', 'off-white', 'brown', 'green', 'black'].map(c => c.toLowerCase());
+
+    const sizesQuery = 'SELECT DISTINCT size FROM products WHERE category = ?';
+    const brandsQuery = 'SELECT DISTINCT brand FROM products WHERE category = ?';
+    const conditionsQuery = 'SELECT DISTINCT condition FROM products WHERE category = ?';
+    const colorsQuery = `SELECT DISTINCT color FROM products WHERE category = ? AND LOWER(TRIM(color)) IN (${allowedColors.map(() => '?').join(',')})`;
+    const productidQuery = 'SELECT productid FROM products WHERE category = ?';
+
+    const queryParams = [category];
+
+    const [sizesRows] = await pool.query(sizesQuery, queryParams);
+    const [brandsRows] = await pool.query(brandsQuery, queryParams);
+    const [conditionsRows] = await pool.query(conditionsQuery, queryParams);
+    const [colorsRows] = await pool.query(colorsQuery, [category, ...allowedColors]);
+    const [productidRows] = await pool.query(productidQuery, queryParams);
+
+    const filterOptions = {
+      productids: productidRows.map((row) => row.productid),
+      sizes: sizesRows.map((row) => row.size),
+      brands: brandsRows.map((row) => row.brand),
+      conditions: conditionsRows.map((row) => row.condition),
+      colors: colorsRows.map((row) => row.color),
+    };
+
+    console.log('Furniture filter options:', filterOptions);
+    res.json(filterOptions);
+    console.log('Furniture filter options fetched successfully');
+  } catch (error) {
+    console.error('Error fetching furniture filter options:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/filterOptions/fashion', async (req, res) => {
+  try {
+    const category = 'fashion';
+
+    const sizesQuery = 'SELECT DISTINCT size FROM products WHERE category = ?';
+    const brandsQuery = 'SELECT DISTINCT brand FROM products WHERE category = ?';
+    const conditionsQuery = 'SELECT DISTINCT condition FROM products WHERE category = ?';
+    const colorsQuery = 'SELECT DISTINCT color FROM products WHERE category = ?';
+    const productidQuery = 'SELECT productid FROM products WHERE category = ?';
+
+    const queryParams = [category];
+
+    const [sizesRows] = await pool.query(sizesQuery, queryParams);
+    const [brandsRows] = await pool.query(brandsQuery, queryParams);
+    const [conditionsRows] = await pool.query(conditionsQuery, queryParams);
+    const [colorsRows] = await pool.query(colorsQuery, queryParams);
+    const [productidRows] = await pool.query(productidQuery, queryParams);
+
+    const filterOptions = {
+      productids: productidRows.map((row) => row.productid),
+      sizes: sizesRows.map((row) => row.size),
+      brands: brandsRows.map((row) => row.brand),
+      conditions: conditionsRows.map((row) => row.condition),
+      colors: colorsRows.map((row) => row.color),
+    };
+
+    console.log('Fashion filter options:', filterOptions);
+    res.json(filterOptions);
+    console.log('Fashion filter options fetched successfully');
+  } catch (error) {
+    console.error('Error fetching fashion filter options:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

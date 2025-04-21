@@ -26,7 +26,7 @@ export default function Fashion() {
       {isLoading ? (
         <Circular isLoading={isLoading} />
       ) : (
-       <ProductList />
+       <ProductList category="fashion" />
       )}
 
       <Signupfree />

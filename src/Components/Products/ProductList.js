@@ -44,7 +44,7 @@ const renderSelectableBoxes = (values, onClickHandler, selectedValues, label, sh
   </div>
 );
 
-const ProductList = () => {
+const ProductList = ({ category }) => {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.allproducts);
   const discounts = useSelector((state) => state.discount.discounts);
@@ -74,7 +74,34 @@ const ProductList = () => {
   }, [dispatch]);
 
   const uniqueBrands = Array.from(new Set(data.userscontainer && Array.isArray(data.userscontainer) ? data.userscontainer.map(ele => ele.brand) : []));
-  const uniqueColors = ["Blue", "Red", "Yellow", "White", "Black", "Brown", "Purple"];
+
+  // Filter unique colors based on category from products in that category
+  const uniqueColors = category
+    ? Array.from(new Set(
+        data.userscontainer
+          .filter(ele => ele.category && ele.category.toLowerCase() === category.toLowerCase())
+          .map(ele => ele.color)
+      ))
+    : Array.from(new Set(data.userscontainer && Array.isArray(data.userscontainer) ? data.userscontainer.map(ele => ele.color) : []));
+
+  // Filter unique sub categories based on category from products in that category
+  const uniqueSubCategories = category
+    ? Array.from(new Set(
+        data.userscontainer
+          .filter(ele => ele.category && ele.category.toLowerCase() === category.toLowerCase())
+          .map(ele => ele.sub_cat)
+      ))
+    : [];
+  
+  const [selectedSubCategories, setSelectedSubCategories] = React.useState([]);
+  
+  const handleSubCategoryClick = (subCategory) => {
+    const newSelectedSubCategories = selectedSubCategories.includes(subCategory)
+      ? selectedSubCategories.filter((sc) => sc !== subCategory)
+      : [...selectedSubCategories, subCategory];
+    setSelectedSubCategories(newSelectedSubCategories);
+    applyFilter({ brands: selectedBrands, colors: selectedColors, subCategories: newSelectedSubCategories });
+  };
 
   const handleBrandClick = (brand) => {
     const newSelectedBrands = selectedBrands.includes(brand)
@@ -83,7 +110,7 @@ const ProductList = () => {
 
     setSelectedBrands(newSelectedBrands);
 
-    applyFilter({ brands: newSelectedBrands, colors: selectedColors });
+    applyFilter({ brands: newSelectedBrands, colors: selectedColors, subCategories: selectedSubCategories });
   };
 
   const handleColorClick = (color) => {
@@ -93,17 +120,18 @@ const ProductList = () => {
 
     setSelectedColors(newSelectedColors);
 
-    applyFilter({ brands: selectedBrands, colors: newSelectedColors });
+    applyFilter({ brands: selectedBrands, colors: newSelectedColors, subCategories: selectedSubCategories });
   };
 
   const handleResetFilters = () => {
     setSelectedBrands([]);
     setSelectedColors([]);
+    setSelectedSubCategories([]);
     setMinPrice(0);
     setMaxPrice(5000);
 
     // Reset filters to show all products
-    dispatch(filterusers({ brands: [], colors: [], minPrice: 0, maxPrice: 5000 }));
+    dispatch(filterusers({ brands: [], colors: [], subCategories: [], minPrice: 0, maxPrice: 5000 }));
   };
 
   const applyFilter = (filters) => {
@@ -199,33 +227,39 @@ const ProductList = () => {
             <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>Brand</Typography>
             {data.users && renderSelectableBoxes(uniqueBrands, handleBrandClick, selectedBrands, undefined, true)}
             <div style={{ margin: '20px 0' }}>
-              <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
-                Color
-              </Typography>
-              {renderSelectableBoxes(uniqueColors, handleColorClick, selectedColors, undefined, true)}
-            </div>
-            <div style={{ margin: '20px 0' }}>
-              <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
-                Price Range
-              </Typography>
-              <Slider
-                range
-                min={0}
-                max={10000}
-                defaultValue={[minPrice, maxPrice]}
-                onChange={handlePriceChange}
-                style={{ width: '90%', marginLeft: '5px' }}
-                trackStyle={{ backgroundColor: '#101820' }}
-                handleStyle={{
-                  borderColor: '#101820',
-                  backgroundColor: '#101820',
-                }}
-                railStyle={{ backgroundColor: '#D3D3D3' }}
-              />
-              <Typography style={{ marginTop: '10px' }}>
-                USD: Rs.{minPrice} - Rs.{maxPrice}
-              </Typography>
-            </div>
+            <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
+              Color
+            </Typography>
+            {renderSelectableBoxes(uniqueColors, handleColorClick, selectedColors, undefined, true)}
+          </div>
+          <div style={{ margin: '20px 0' }}>
+            <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
+              Sub Category
+            </Typography>
+            {renderSelectableBoxes(uniqueSubCategories, handleSubCategoryClick, selectedSubCategories, undefined, true)}
+          </div>
+          <div style={{ margin: '20px 0' }}>
+            <Typography style={{ paddingBottom: '5px', fontSize: '16px', color: '#101820', fontWeight: 'inherit' }}>
+              Price Range
+            </Typography>
+            <Slider
+              range
+              min={0}
+              max={10000}
+              defaultValue={[minPrice, maxPrice]}
+              onChange={handlePriceChange}
+              style={{ width: '90%', marginLeft: '5px' }}
+              trackStyle={{ backgroundColor: '#101820' }}
+              handleStyle={{
+                borderColor: '#101820',
+                backgroundColor: '#101820',
+              }}
+              railStyle={{ backgroundColor: '#D3D3D3' }}
+            />
+            <Typography style={{ marginTop: '10px' }}>
+              USD: Rs.{minPrice} - Rs.{maxPrice}
+            </Typography>
+          </div>
           </div>
           <Button
             variant="outlined"
@@ -253,7 +287,7 @@ const ProductList = () => {
           {currentProducts.map((ele) => {
             // const firstImage = ele.image ? ele.image.split(',')[0].trim() : '';
             // const image1URL = "http://localhost:3001/" + firstImage;
-            const image1URL = require(`../../assets/images/${ele.image_path}`);
+const image1URL = `http://localhost:3001/productimages/${ele.image_path}`;
             // const discountedPrice = getDiscountedPrice(ele.price);
             // const isDiscountAvailable = discountedPrice !== ele.price.toFixed(2);
 
