@@ -1,0 +1,283 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Box,
+  IconButton
+} from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';
+import CloseIcon from '@mui/icons-material/Close';
+import { useSelector } from 'react-redux';
+import './Chatbot.css';
+
+// Define message types
+const MessageType = {
+  BOT: 'bot',
+  USER: 'user',
+  QUESTION: 'question',
+  OPTION: 'option',
+  ORDER: 'order',
+  RECOMMENDATION: 'recommendation'
+};
+
+/**
+ * @typedef {Object} Message
+ * @property {string} type
+ * @property {string} content
+ * @property {string} [answer]
+ */
+
+/**
+ * @typedef {Object} RootState
+ * @property {Object} auth
+ * @property {boolean} auth.isLoggedIn
+ * @property {Object} orders
+ * @property {Array} orders.orders
+ */
+
+const Chatbot = () => {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [botName, setBotName] = useState('AR Shop Assistant');
+  const [userName, setUserName] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const user = useSelector((state) => state.user);
+  const orders = useSelector((state) => state.orders);
+
+  useEffect(() => {
+    if (user?.email) {
+      const name = user.email.split('@')[0];
+      setUserName(name.charAt(0).toUpperCase() + name.slice(1));
+    }
+  }, [user]);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+    if (messages.length === 0) {
+      const greeting = user?.email
+        ? `Hello ${userName}! How can I help you today?`
+        : 'Welcome to AR Shop! How can I assist you?';
+      
+      setMessages([
+        { type: MessageType.BOT, content: greeting }
+      ]);
+
+      setTimeout(() => {
+        setMessages(prev => [
+          ...prev,
+          { type: MessageType.QUESTION, content: 'Learn about AR features' },
+          { type: MessageType.QUESTION, content: 'View my order history' },
+          { type: MessageType.QUESTION, content: 'Get personalized recommendations' }
+        ]);
+      }, 1000);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const simulateTyping = (callback) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      callback();
+    }, 1000);
+  };
+
+  const handleQuestionClick = (question) => {
+    setMessages(prev => [...prev, { type: MessageType.USER, content: question }]);
+
+    simulateTyping(() => {
+      let response;
+      switch (question) {
+        case 'Learn about AR features':
+          response = {
+            type: MessageType.BOT,
+            content: 'Our AR technology allows you to:\n- Try on clothing virtually\n- Visualize home decor in your space\n- See how furniture fits in your room\n- Test makeup and accessories\nWould you like to try it now?'
+          };
+          break;
+        case 'View my order history':
+          if (!user?.email) {
+            response = {
+              type: MessageType.BOT,
+              content: 'Please log in to view your order history.'
+            };
+          } else if (!orders?.length) {
+            response = {
+              type: MessageType.BOT,
+              content: 'You haven\'t placed any orders yet.'
+            };
+          } else {
+            const orderLinks = orders.map(order => ({
+              type: MessageType.ORDER,
+              content: `Order #${order.id} - ${order.total} - ${order.status}`,
+              link: `/orders/${order.id}`
+            }));
+            setMessages(prev => [...prev, response, ...orderLinks]);
+            return;
+          }
+          break;
+        case 'Get personalized recommendations':
+          if (!user?.email) {
+            response = {
+              type: MessageType.BOT,
+              content: 'Please log in to get personalized recommendations.'
+            };
+          } else if (!orders?.length) {
+            response = {
+              type: MessageType.BOT,
+              content: 'Start shopping to get personalized recommendations!'
+            };
+          } else {
+            const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
+            const recommendations = [
+              {
+                type: MessageType.RECOMMENDATION,
+                content: 'Based on your spending, you might like our premium collection!',
+                link: '/products/premium'
+              },
+              {
+                type: MessageType.RECOMMENDATION,
+                content: 'Check out our new arrivals that match your style!',
+                link: '/products/new'
+              }
+            ];
+            setMessages(prev => [...prev, ...recommendations]);
+            return;
+          }
+          break;
+        default:
+          response = {
+            type: MessageType.BOT,
+            content: 'I\'m not sure about that. Would you like to:\n- Learn about AR features\n- View my order history\n- Get personalized recommendations'
+          };
+      }
+      setMessages(prev => [...prev, response]);
+    });
+  };
+
+  const handleOptionClick = (option) => {
+    setMessages(prev => [...prev, { type: MessageType.USER, content: option }]);
+    // Handle option clicks here
+  };
+
+  const handleSendMessage = () => {
+    if (inputMessage.trim()) {
+      setMessages(prev => [...prev, { type: MessageType.USER, content: inputMessage }]);
+      setInputMessage('');
+
+      simulateTyping(() => {
+        const response = {
+          type: MessageType.BOT,
+          content: 'I understand you\'re asking about "' + inputMessage + '". Would you like to:\n- Learn about AR features\n- View my order history\n- Get personalized recommendations'
+        };
+        setMessages(prev => [...prev, response]);
+      });
+    }
+  };
+
+  return (
+    <>
+      <Fab
+        color="primary"
+        aria-label="chat"
+        onClick={handleClickOpen}
+        className="chatbot-fab"
+      >
+        <ChatIcon />
+      </Fab>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        className="chatbot-dialog"
+        PaperProps={{
+          style: {
+            position: 'fixed',
+            bottom: '80px',
+            right: '20px',
+            margin: 0,
+            maxWidth: '350px',
+            width: '350px',
+            maxHeight: '500px',
+            height: 'auto'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">{botName}</Typography>
+            <IconButton onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent className="chatbot-content">
+          <List>
+            {messages.map((message, index) => (
+              <ListItem key={index} className={`message ${message.type}`}>
+                {(message.type === MessageType.QUESTION || message.type === MessageType.OPTION) ? (
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      message.type === MessageType.QUESTION
+                        ? handleQuestionClick(message.content)
+                        : handleOptionClick(message.content)
+                    }
+                  >
+                    {message.content}
+                  </Button>
+                ) : message.type === MessageType.ORDER || message.type === MessageType.RECOMMENDATION ? (
+                  <Button
+                    variant="text"
+                    onClick={() => message.link && (window.location.href = message.link)}
+                    style={{ textAlign: 'left', justifyContent: 'flex-start', width: '100%' }}
+                  >
+                    {message.content}
+                  </Button>
+                ) : (
+                  <ListItemText primary={message.content} />
+                )}
+              </ListItem>
+            ))}
+            {isTyping && (
+              <ListItem className="message bot">
+                <ListItemText primary="Typing..." />
+              </ListItem>
+            )}
+          </List>
+        </DialogContent>
+
+        <DialogActions>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Type your message..."
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+          />
+          <Button onClick={handleSendMessage} color="primary">
+            Send
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+};
+
+export default Chatbot;

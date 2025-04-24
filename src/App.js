@@ -18,6 +18,7 @@ import Fashion from './Components/Fashion/Fashion';
 import Orderhistory from './Components/Orderhistory/index';
 import Verifyemailindex from './Components/verifyemail/verifyemailindex'
 import Category from './Components/Category/Category';
+import Chatbot from './Components/Chatbot/Chatbot';
 
 function App() {
   const routes = [
@@ -79,6 +80,7 @@ function App() {
             <Route key={index} path={route.path} element={route.element} />
           ))}
         </Routes>
+        <Chatbot />
       </Router>
     </>
   );
