@@ -28,6 +28,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useSelector } from 'react-redux';
 import { selectEmail, selectLoginStatusexist } from '../../features/authslice';
 import './Chatbot.css';
+import { useNavigate } from 'react-router-dom';
 
 // Define message types
 const MessageType = {
@@ -70,7 +71,11 @@ const Chatbot = () => {
   const [theme, setTheme] = useState('light');
   const userEmail = useSelector(selectEmail);
   const isLoggedIn = useSelector(selectLoginStatusexist);
-  const orders = useSelector((state) => state.ordershistory?.grandTotals || []);
+  const orders = useSelector((state) => {
+    if (!state.ordershistory) return [];
+    return state.ordershistory.grandTotals || [];
+  });
+  const navigate = useNavigate();
 
   // Predefined questions and answers
   const predefinedQuestions = {
@@ -91,8 +96,8 @@ const Chatbot = () => {
       followUp: ['View products', 'Current deals', 'Bundle offers']
     },
     'cost': {
-      answer: 'Our AR products range from $99 to $499, depending on the model and features. We offer flexible payment options:\n\n1. Digital Payments:\n   - UPI (Google Pay, PhonePe, Paytm)\n   - Credit/Debit Cards (Visa, MasterCard, American Express)\n   - Digital Wallets (Apple Pay, Google Pay)\n\n2. Traditional Payments:\n   - Cash on Delivery\n   - Bank Transfer\n   - EMI Options Available\n\n3. Additional Benefits:\n   - Secure Payment Gateway\n   - 100% Payment Protection\n   - Multiple Currency Support\n   - Easy Refund Process\n\nWould you like to know more about any specific payment method?',
-      followUp: ['Payment Security', 'EMI Options', 'Refund Policy']
+      answer: 'Our AR products range from Rs99 to Rs499, depending on the model and features. We currently offer only Cash on Delivery as the payment method for your convenience.\n\nWould you like to know more about our return or refund process?',
+      followUp: ['Refund Policy']
     },
     'ar technology': {
       answer: 'Our AR technology uses advanced computer vision and spatial computing to create immersive experiences. It\'s compatible with most modern smartphones and tablets.',
@@ -119,32 +124,20 @@ const Chatbot = () => {
       followUp: ['Rate products', 'Rate service', 'Rate website']
     },
     'view products': {
-      answer: 'I can help you browse our products. Which category interests you?',
+      answer: 'You can browse our products by:\n1. Category (Clothing, Home, Beauty)\n2. Price range\n3. New arrivals\n4. Best sellers\n5. Special offers',
       followUp: ['View Fashion', 'View Furniture']
-    },
-    'view fashion': {
-      answer: 'Redirecting you to our Fashion collection...',
-      link: '/Fashion'
     },
     'view furniture': {
       answer: 'Redirecting you to our Furniture collection...',
-      link: '/Furniture'
+      action: () => navigate('/Furniture')
     },
-    'view electronics': {
-      answer: 'Redirecting you to our Electronics collection...',
-      link: '/products/electronics'
-    },
-    'view home decor': {
-      answer: 'Redirecting you to our Home Decor collection...',
-      link: '/products/home-decor'
+    'view fashion': {
+      answer: 'Redirecting you to our Fashion collection...',
+      action: () => navigate('/Fashion')
     },
     'payment security': {
       answer: 'We ensure your payment security through:\n\n1. SSL Encryption\n2. PCI DSS Compliance\n3. 3D Secure Authentication\n4. Fraud Detection Systems\n5. Secure Payment Gateway\n\nYour payment information is never stored on our servers. Would you like to proceed with your purchase?',
       followUp: ['Start Shopping', 'View Products', 'Contact Support']
-    },
-    'emi options': {
-      answer: 'We offer flexible EMI options:\n\n1. Duration: 3, 6, 9, or 12 months\n2. Zero Down Payment Available\n3. Interest Rates Starting from 0%\n4. Instant Approval\n5. No Hidden Charges\n\nWould you like to check your EMI eligibility?',
-      followUp: ['Check Eligibility', 'View Products', 'Contact Support']
     },
     'refund policy': {
       answer: 'Our refund policy is customer-friendly:\n\n1. 30-Day Money Back Guarantee\n2. Full Refund for Unused Products\n3. Free Return Shipping\n4. Instant Refund Processing\n5. Multiple Refund Options\n\nWould you like to know more about our return process?',
@@ -269,7 +262,7 @@ const Chatbot = () => {
         case 'Learn about AR features':
           response = {
             type: MessageType.BOT,
-            content: 'Our AR technology allows you to:\n- Try on clothing virtually\n- Visualize home decor in your space\n- See how furniture fits in your room\n- Test makeup and accessories\nWould you like to try it now?'
+            content: 'Our AR technology allows you to:\n- Try on clothing virtually\n- Visualize home decor in your space\n- See how furniture fits in your room \nWould you like to try it now?'
           };
           break;
         case 'View my order history':
@@ -287,7 +280,7 @@ const Chatbot = () => {
             const orderLinks = orders.map((total, index) => ({
               type: MessageType.ORDER,
               content: `Order #${index + 1} - Rs.${total}`,
-              link: `/Orderhistory`
+              link: '/Orderhistory'
             }));
             setMessages(prev => [...prev, ...orderLinks]);
             return;
@@ -310,12 +303,12 @@ const Chatbot = () => {
               {
                 type: MessageType.RECOMMENDATION,
                 content: 'Based on your spending, you might like our premium collection!',
-                link: '/products/premium'
+                link: 'http://localhost:3000/Fashion'
               },
               {
                 type: MessageType.RECOMMENDATION,
                 content: 'Check out our new arrivals that match your style!',
-                link: '/products/new'
+                link: 'http://localhost:3000/Furniture'
               }
             ];
             setMessages(prev => [...prev, ...recommendations]);
@@ -362,12 +355,6 @@ const Chatbot = () => {
           };
           break;
         // Follow-up questions for pricing
-        case 'View products':
-          response = {
-            type: MessageType.BOT,
-            content: 'You can browse our products by:\n1. Category (Clothing, Home, Beauty)\n2. Price range\n3. New arrivals\n4. Best sellers\n5. Special offers'
-          };
-          break;
         case 'Current deals':
           response = {
             type: MessageType.BOT,
@@ -377,7 +364,7 @@ const Chatbot = () => {
         case 'Bundle offers':
           response = {
             type: MessageType.BOT,
-            content: 'Special bundle deals:\n- 2 dresses: $199 (Save $50)\n- Pro Bundle: $299 (Save $100)\n- Family Pack Hats: $399 (Save $150)\nAll bundles include free shipping!'
+            content: 'Special bundle deals:\n- 2 dresses: Rs199 (Save Rs50)\n- Pro Bundle: Rs299 (Save Rs100)\n- Family Pack Hats: Rs399 (Save Rs150)\nAll bundles include free shipping!'
           };
           break;
         // Follow-up questions for AR technology
@@ -448,29 +435,24 @@ const Chatbot = () => {
         case 'View Fashion':
           response = {
             type: MessageType.BOT,
-            content: 'Redirecting you to our Fashion collection...',
-            link: '/Fashion'
+            content: 'Redirecting you to our Fashion collection...'
           };
-          break;
+          setMessages(prev => [...prev, response]);
+          navigate('/Fashion');
+          return;
         case 'View Furniture':
           response = {
             type: MessageType.BOT,
-            content: 'Redirecting you to our Furniture collection...',
-            link: '/Furniture'
+            content: 'Redirecting you to our Furniture collection...'
           };
-          break;
+          setMessages(prev => [...prev, response]);
+          navigate('/Furniture');
+          return;
         case 'Payment Security':
           response = {
             type: MessageType.BOT,
             content: predefinedQuestions['payment security'].answer,
             followUp: predefinedQuestions['payment security'].followUp
-          };
-          break;
-        case 'EMI Options':
-          response = {
-            type: MessageType.BOT,
-            content: predefinedQuestions['emi options'].answer,
-            followUp: predefinedQuestions['emi options'].followUp
           };
           break;
         case 'Refund Policy':
@@ -557,18 +539,26 @@ const Chatbot = () => {
       userMessage.includes(q.toLowerCase())
     );
 
-    if (matchedQuestion) {
+    if (matchedQuestion && predefinedQuestions[matchedQuestion]) {
       simulateTyping(() => {
+        const question = predefinedQuestions[matchedQuestion];
         setMessages(prev => [
           ...prev,
-          { type: MessageType.BOT, content: predefinedQuestions[matchedQuestion].answer }
+          { type: MessageType.BOT, content: question.answer }
         ]);
+
+        // Execute action if exists
+        if (question.action) {
+          question.action();
+          return;
+        }
 
         // Add follow-up questions
         setTimeout(() => {
+          const followUpQuestions = question.followUp || [];
           setMessages(prev => [
             ...prev,
-            ...predefinedQuestions[matchedQuestion].followUp.map(q => ({
+            ...followUpQuestions.map(q => ({
               type: MessageType.QUESTION,
               content: q
             }))
@@ -1005,7 +995,15 @@ const Chatbot = () => {
                 ) : message.type === MessageType.ORDER || message.type === MessageType.RECOMMENDATION ? (
                   <Button
                     variant="text"
-                    onClick={() => message.link && (window.location.href = message.link)}
+                    onClick={() => {
+                      if (message.link) {
+                        if (message.link.startsWith('http')) {
+                          window.open(message.link, '_blank');
+                        } else {
+                          navigate(message.link);
+                        }
+                      }
+                    }}
                     sx={{
                       textAlign: 'left',
                       justifyContent: 'flex-start',
@@ -1049,7 +1047,7 @@ const Chatbot = () => {
         <DialogActions sx={{ 
           padding: '16px',
           backgroundColor: theme === 'dark' ? '#1a1a1a' : '#ffffff',
-          borderTop: `1px solid ${theme === 'dark' ? '#333333' : '#e0e0e0'}`
+        borderTop: `1px solid ${theme === 'dark' ? '#333333' : '#e0e0e0'}`
         }}>
           <IconButton 
             onClick={handleVoiceInput} 
