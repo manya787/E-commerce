@@ -30,13 +30,16 @@ const OrderSummary = () => {
       return discount.isActive === 1 && today >= startDate && today <= endDate;
     });
 
+    // Convert price to number if it's a string
+    const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+
     if (discount) {
       const discountAmount = discount.amount;
-      const discountedPrice = price - (price * (discountAmount / 100));
+      const discountedPrice = numericPrice - (numericPrice * (discountAmount / 100));
       return discountedPrice.toFixed(2);
     }
 
-    return price.toFixed(2);
+    return numericPrice.toFixed(2);
   };
 
   const shippingCharges = 6;

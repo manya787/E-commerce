@@ -280,7 +280,7 @@ const Chatbot = () => {
             const orderLinks = orders.map((total, index) => ({
               type: MessageType.ORDER,
               content: `Order #${index + 1} - Rs.${total}`,
-              link: '/Orderhistory'
+              link: `/Orderhistory`
             }));
             setMessages(prev => [...prev, ...orderLinks]);
             return;
@@ -1047,7 +1047,7 @@ const Chatbot = () => {
         <DialogActions sx={{ 
           padding: '16px',
           backgroundColor: theme === 'dark' ? '#1a1a1a' : '#ffffff',
-        borderTop: `1px solid ${theme === 'dark' ? '#333333' : '#e0e0e0'}`
+          borderTop: `1px solid ${theme === 'dark' ? '#333333' : '#e0e0e0'}`
         }}>
           <IconButton 
             onClick={handleVoiceInput} 
