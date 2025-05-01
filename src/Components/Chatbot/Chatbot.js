@@ -92,7 +92,7 @@ const Chatbot = () => {
       followUp: ['Start return', 'Return policy details', 'Contact support']
     },
     'price': {
-      answer: 'Our AR products are competitively priced, starting from $99. We often have special discounts and bundle offers. Check our website for current promotions!',
+      answer: 'Our AR products are competitively priced, starting from Rs. 99. We often have special discounts and bundle offers. Check our website for current promotions!',
       followUp: ['View products', 'Current deals', 'Bundle offers']
     },
     'cost': {
@@ -325,14 +325,14 @@ const Chatbot = () => {
         case 'Shipping rates':
           response = {
             type: MessageType.BOT,
-            content: 'Our shipping rates are:\n- Standard (3-5 days): $5.99\n- Express (1-2 days): $12.99\n- International: Starting from $19.99\nFree shipping on orders over $50!'
+            content: 'Our shipping rates are:\n- Standard (3-5 days): Rs. 6.00'
           };
           break;
         // Follow-up questions for delivery
         case 'Delivery time':
           response = {
             type: MessageType.BOT,
-            content: 'Delivery times vary by location:\n- US: 3-5 business days\n- Canada: 5-7 business days\n- Europe: 7-10 business days\n- Rest of the world: 10-14 business days'
+            content: 'Delivery times vary by location:\n- US: 2-3 business days\n- Canada: 5-7 business days\n- Europe: 7-10 business days\n- Rest of the world: 10-14 business days'
           };
           break;
         case 'Contact support':
